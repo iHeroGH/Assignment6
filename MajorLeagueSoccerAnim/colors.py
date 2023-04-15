@@ -16,4 +16,3 @@ class Color:
     BRIGHT_YELLOW = (255, 244, 47)
     NIGHT_GRAY = (104, 98, 115)
     COLOR_KEY = (127, 33, 33)
-
