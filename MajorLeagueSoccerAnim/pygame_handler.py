@@ -40,14 +40,13 @@ class PygameHandler:
         (if the lights were turned off, or it was nighttime)
     see_through : pygame.Surface
         A surface that will house the clouds and stars
-    
     """
 
     def __init__(self, config: Config, artist: Artist):
         """Initializes attributes of the Handler class
         
-        Parameters:
-        -----------
+        Parameters
+        ----------
         config : Config
             An instance of the Config class that contains all the color options
             and day/lights settings for the game
@@ -71,6 +70,7 @@ class PygameHandler:
         self.done: bool = False
     
     def init_pygame(self) -> None:
+        """Quits the Pygame instance by simply calling .init()"""
         pygame.init()
 
     def create_display(
@@ -79,13 +79,14 @@ class PygameHandler:
             height: int
             ) -> None:
         """
-        Creates display for graphics using width and height
+        Creates display for the program using the width and height
 
+        Parameters
+        ----------
         width : int
-            Sets the width of the screen  
-
+            The width of the screen
         height : int
-            Sets the height of the screen  
+            The height of the screen
 
         """
         self.screen = pygame.display.set_mode((width, height))
@@ -93,13 +94,14 @@ class PygameHandler:
 
     def create_timer(self) -> None:
         """
-        Creates timer using pygame Clock class to keep track of time in a game and ensure 
-        that the game runs consistently.
+        Creates a timer using the Pygame.time.Clock object which will be used
+        to keep track of time (or to create a countdown in the future)
 
+        Parameters
+        ----------
         clock : pygame.time.Clock
             A Pygame Clock object to help keep track of time
             (can be used in the future on the scoreboard to create a countdown)
-
         refresh_rate : int
             The refresh rate of the screen
         """
@@ -108,12 +110,13 @@ class PygameHandler:
     
     def create_darkness(self) -> None:
         """
-        Creates a surface that will be overlaid onto the screen to imitate darkness.
+        Creates a surface that will be overlaid onto the screen to create darkness.
 
+        Parameters
+        ----------
         darkness : pygame.Surface
-            A surface that will be overlaid onto the screen to imitate darkness
+            A surface that will be overlaid onto the screen to create darkness
             (if the lights were turned off, or it was nighttime)
-
         """
         self.darkness: pygame.Surface = pygame.Surface(
                                                         (self.width, 
@@ -146,10 +149,10 @@ class PygameHandler:
         """
         Handles key events in the Pygame event queue
 
-        Parameters:
+        Parameters
         -----------
         event: pygame.event.Event
-            Determines the instance of an event (key press)
+            A keyboard-press event that will be analyzed in the function
         """
         if event.key == pygame.K_l:
             self.config.switch_light()
