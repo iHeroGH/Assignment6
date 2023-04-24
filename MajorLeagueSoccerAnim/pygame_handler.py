@@ -44,6 +44,16 @@ class PygameHandler:
     """
 
     def __init__(self, config: Config, artist: Artist):
+        """Initializes attributes of the Handler class
+        
+        Parameters:
+        -----------
+        config : Config
+            An instance of the Config class that contains all the color options
+            and day/lights settings for the game
+        artist : Artist
+            An instance of the Artist class that houses all the drawing functions
+        """
         self.config: Config = config
         self.artist: Artist = artist
 
@@ -69,21 +79,41 @@ class PygameHandler:
             height: int
             ) -> None:
         """
-        ...
+        Creates display for graphics using width and height
+
+        width : int
+            Sets the width of the screen  
+
+        height : int
+            Sets the height of the screen  
+
         """
         self.screen = pygame.display.set_mode((width, height))
         pygame.display.set_caption("Major League Soccer")
 
     def create_timer(self) -> None:
         """
-        ...
+        Creates timer using pygame Clock class to keep track of time in a game and ensure 
+        that the game runs consistently.
+
+        clock : pygame.time.Clock
+            A Pygame Clock object to help keep track of time
+            (can be used in the future on the scoreboard to create a countdown)
+
+        refresh_rate : int
+            The refresh rate of the screen
         """
         self.clock: pygame.time.Clock = pygame.time.Clock()
         self.refresh_rate: int = 60
     
     def create_darkness(self) -> None:
         """
-        ...
+        Creates a surface that will be overlaid onto the screen to imitate darkness.
+
+        darkness : pygame.Surface
+            A surface that will be overlaid onto the screen to imitate darkness
+            (if the lights were turned off, or it was nighttime)
+
         """
         self.darkness: pygame.Surface = pygame.Surface(
                                                         (self.width, 
@@ -94,7 +124,7 @@ class PygameHandler:
     
     def create_see_through(self) -> None:
         """
-        ...
+        Creates a surface that will house the clouds and stars.
         """
         self.see_through: pygame.Surface = pygame.Surface(
                                                             (self.width, 
@@ -104,7 +134,7 @@ class PygameHandler:
     
     def handle_events(self) -> None:
         """
-        ...
+        Handles all events in the Pygame event queue
         """
         for event in pygame.event.get():
             if event.type == pygame.QUIT:
@@ -114,7 +144,12 @@ class PygameHandler:
 
     def handle_key_events(self, event: pygame.event.Event) -> None:
         """
-        ...
+        Handles key events in the Pygame event queue
+
+        Parameters:
+        -----------
+        event: pygame.event.Event
+            Determines the instance of an event (key press)
         """
         if event.key == pygame.K_l:
             self.config.switch_light()
@@ -123,13 +158,13 @@ class PygameHandler:
 
     def clock_tick(self) -> None:
         """
-        ...
+        Handles frame rate of the game
         """
         self.clock.tick(self.refresh_rate)
 
     def game_loop(self) -> None:
         """
-        ...
+        The main game loop that calls all the necessary functions to run the game.
         """
         while not self.done:
             self.handle_events()
