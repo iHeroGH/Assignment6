@@ -1,7 +1,5 @@
 class Color:
-    """ 
-    A class containing (R, G, B) tuple definitions for a variety of colors.
-    """
+    """A class containing (R, G, B) tuple definitions for a variety of colors."""
 
     BLACK = (0, 0, 0)
     RED = (255, 0, 0)

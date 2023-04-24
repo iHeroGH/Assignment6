@@ -48,7 +48,8 @@ class Config:
 
     @property
     def light_color(self) -> tuple:
-        """Returns the light's color
+        """
+        Returns the light's color
         
         This method uses the _light_on attribute to calculate what color 
         should be returned
@@ -62,7 +63,8 @@ class Config:
     
     @property
     def sky_color(self) -> tuple:
-        """Returns the sky's color
+        """
+        Returns the sky's color
         
         This method uses the _day attribute to calculate what color 
         should be returned
@@ -76,7 +78,8 @@ class Config:
 
     @property
     def field_color(self) -> tuple:
-        """Returns the field's color
+        """
+        Returns the field's color
         
         This method uses the _day attribute to calculate what color 
         should be returned
@@ -90,7 +93,8 @@ class Config:
 
     @property
     def stripe_color(self) -> tuple:
-        """Returns the stripe's color
+        """
+        Returns the stripe's color
         
         This method uses the _day attribute to calculate what color 
         should be returned
@@ -104,7 +108,8 @@ class Config:
 
     @property
     def cloud_color(self) -> tuple:
-        """Returns the cloud's color
+        """
+        Returns the cloud's color
         
         This method uses the _day attribute to calculate what color 
         should be returned

@@ -176,7 +176,5 @@ class PygameHandler:
         self.quit()
 
     def quit(self) -> None:
-        """
-        Quits the Pygame instance by simply calling .quit()
-        """
+        """Quits the Pygame instance by simply calling .quit()"""
         pygame.quit()

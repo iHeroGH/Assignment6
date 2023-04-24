@@ -803,7 +803,5 @@ class Artist:
         self.draw_corner_flags(surface)
     
     def update_screen(self) -> None:
-        """
-        Updates the pygame screen by simply calling display.flip()
-        """
+        """Updates the pygame screen by simply calling display.flip()"""
         pygame.display.flip()
