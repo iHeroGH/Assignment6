@@ -1,5 +1,4 @@
 import pygame
-
 from colors import Color
 from config import Config
 
@@ -59,3 +58,6 @@ class PygameHandler:
 
     def quit(self):
         pygame.quit()
+
+    def game_loop(self):
+        return None
