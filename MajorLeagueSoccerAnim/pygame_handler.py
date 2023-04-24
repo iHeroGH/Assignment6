@@ -4,14 +4,53 @@ from config import Config
 from artist import Artist
 
 class PygameHandler:
+    """
+    Handles all the non-visual Pygame operations (like events) of the project.
+
+    The handler is the main delegator for the operation, checking configuration
+    settings, calling draw methods, and initializing/maintaining the Pygame
+    surfaces. The main game loop is also held in this class
+    
+    Attributes
+    ----------
+    config : Config
+        An instance of the Config class that contains all the color options
+        and day/lights settings for the game
+    artist : Artist
+        An instance of the Artist class that houses all the drawing functions
+    
+    width : int
+        The width of the screen to initialize
+    height : int
+        The height of the screen to initialize
+    
+    refresh_rate : int
+        The refresh rate of the screen
+    clock : pygame.time.Clock
+        A Pygame Clock object to help keep track of time
+        (can be used in the future on the scoreboard to create a countdown)
+    
+    done : bool
+        A bool denoting whether or not the user has exited
+    
+    screen : pygame.Surface
+        The main surface on which the field will be drawn
+    darkness : pygame.Surface
+        A surface that will be overlaid onto the screen to imitate darkness
+        (if the lights were turned off, or it was nighttime)
+    see_through : pygame.Surface
+        A surface that will house the clouds and stars
+    
+    """
 
     def __init__(self, config: Config, artist: Artist):
-        self.config = config
+        self.config: Config = config
+        self.artist: Artist = artist
 
         self.init_pygame()
 
-        self.width = 800
-        self.height = 600
+        self.width: int = 800
+        self.height: int = 600
 
         self.create_display(self.width, self.height)
         self.create_timer()
@@ -19,88 +58,125 @@ class PygameHandler:
         self.create_darkness()
         self.create_see_through()
 
-        self.gameloop()
-
-        self.done = False
+        self.done: bool = False
     
-    def init_pygame(self):
+    def init_pygame(self) -> None:
         pygame.init()
 
-    def create_display(self, width, height):
+    def create_display(
+            self, 
+            width: int, 
+            height: int
+            ) -> None:
+        """
+        ...
+        """
         self.screen = pygame.display.set_mode((width, height))
         pygame.display.set_caption("Major League Soccer")
 
-    def create_timer(self):
-        self.clock = pygame.time.Clock()
-        self.refresh_rate = 60
+    def create_timer(self) -> None:
+        """
+        ...
+        """
+        self.clock: pygame.time.Clock = pygame.time.Clock()
+        self.refresh_rate: int = 60
     
-    def create_darkness(self):
-        self.DARKNESS = pygame.Surface((self.width, self.height))
-        self.DARKNESS.set_alpha(200)
-        self.DARKNESS.fill(Color.BLACK)
+    def create_darkness(self) -> None:
+        """
+        ...
+        """
+        self.darkness: pygame.Surface = pygame.Surface(
+                                                        (self.width, 
+                                                        self.height)
+                                                    )
+        self.darkness.set_alpha(200)
+        self.darkness.fill(Color.BLACK)
     
-    def create_see_through(self):
-        self.SEE_THROUGH = pygame.Surface((self.width, self.height/3.75))
-        self.SEE_THROUGH.set_alpha(150)
-
-    def handle_events(self):
+    def create_see_through(self) -> None:
+        """
+        ...
+        """
+        self.see_through: pygame.Surface = pygame.Surface(
+                                                            (self.width, 
+                                                            self.height/3.75)
+                                                        )
+        self.see_through.set_alpha(150)
+    
+    def handle_events(self) -> None:
+        """
+        ...
+        """
         for event in pygame.event.get():
             if event.type == pygame.QUIT:
                 self.done = True
             elif event.type == pygame.KEYDOWN:
                 self.handle_key_events(event)
 
-    def handle_key_events(self, event):
+    def handle_key_events(self, event: pygame.event.Event) -> None:
+        """
+        ...
+        """
         if event.key == pygame.K_l:
             self.config.switch_light()
         elif event.key == pygame.K_d:
             self.config.switch_day()
 
-    def clock_tick(self):
+    def clock_tick(self) -> None:
+        """
+        ...
+        """
         self.clock.tick(self.refresh_rate)
 
-    def gameloop(self):
-
+    def game_loop(self) -> None:
+        """
+        ...
+        """
         while not self.done:
-            # Event processing (React to key presses, mouse clicks, etc.)
-            ''' for now, we'll just check to see if the X is clicked '''
             self.handle_events()
 
-             # Game logic (Check for collisions, update points, etc.)
-            ''' leave this section alone for now ''' 
             self.artist.move_clouds()
             
-            # Drawing code (Describe the picture. It isn't actually drawn yet.)
             self.screen.fill(self.config.sky_color)
-            self.SEE_THROUGH.fill(Color.COLOR_KEY)
-            self.SEE_THROUGH.set_colorkey(Color.COLOR_KEY)
+            self.see_through.fill(Color.COLOR_KEY)
+            self.see_through.set_colorkey(Color.COLOR_KEY)
     
             if not self.config.day:
-                self.artist.draw_stars()
+                self.artist.draw_stars(self.see_through)
 
-            self.artist.draw_sun_or_moon()
+            self.artist.draw_sun_or_moon(
+                self.screen, 
+                self.config.day, 
+                self.config.sky_color
+            )
 
-            self.artist.draw_clouds(self.config.cloud_color)
+            self.artist.draw_clouds(
+                self.screen, 
+                self.see_through, 
+                self.config.cloud_color
+            )
 
-            self.screen.blit(self.handler.SEE_THROUGH, (0, 0))   
+            self.artist.draw_field(
+                self.screen, 
+                self.config.field_color, 
+                self.config.stripe_color, 
+                self.config.light_color
+            )
 
-            self.artist.draw_field()
+            self.artist.check_darkness(
+                self.config.day, 
+                self.config.light_on, 
+                self.screen, 
+                self.darkness
+            ) 
 
-            # DARKNESS
-            if not self.config.day and not self.config.light_on:
-                self.screen.blit(self.handler.DARKNESS, (0, 0))    
+            self.artist.update_screen()
 
-            # Update screen (Actually draw the picture in the window.)
-            pygame.display.flip()
+            self.clock_tick()
 
-            # Limit refresh rate of game loop 
-            self.handler.clock_tick()
+        self.quit()
 
-        # Close window and quit
-        self.handler.quit()
-
-    def quit(self):
+    def quit(self) -> None:
+        """
+        Quits the Pygame instance by simply calling .quit()
+        """
         pygame.quit()
-
-    def game_loop(self):
-        return None
