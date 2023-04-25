@@ -474,7 +474,7 @@ class Artist:
         pygame.draw.rect(
             surface, 
             Color.WHITE, 
-            [300, 40, 200, 90], 
+            [302, 42, 198, 88], 
             2
         )
 
