@@ -183,7 +183,6 @@ class PygameHandler:
             # Handle any events if necessary (key presses, exiting)
             self.handle_events()
 
-
             # Maintain the see-through layer
             self.screen.fill(self.config.sky_color)
             self.artist.config_see_through(self.see_through)
