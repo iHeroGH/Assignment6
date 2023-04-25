@@ -2,11 +2,19 @@ import pygame
 import random
 import math
 
+# File Imports
 from colors import Color
 
 class Artist:
     """
     Handles all the draw operations and visual aspects of the project.
+    
+    Attributes
+    ----------
+    clouds : list[list[int, int]]
+        A list of [x, y] coordinates for all the clouds that should be drawn
+    stars : list[list[int, int, int, int]]
+        A list of [x, y, r, r] coordinates for all the stars that should be drawn
     """
 
     def __init__(self):
@@ -16,6 +24,11 @@ class Artist:
     
     def init_clouds(self) -> None:
         """Creates a list of 20 random [x,y] coordinates for cloud positions"""
+        
+        # List comprehension to create a list of [rand number x, rand number y]
+        # x is from -100 to 1600
+        # y is from 0 to 150
+        # We do this 20 times
         self.clouds = [
             [random.randrange(-100, 1600), random.randrange(0, 150)]
             for _ in range(20)
@@ -23,6 +36,14 @@ class Artist:
     
     def init_stars(self) -> None:
         """Creates a list of 20 random [x,y,size] coordinates for stars"""
+        
+        # List comprehension to create a list of [rand x, rand y, rand r, r]
+        # These values will be used to create an elipse, so it needs an extra 'rect' variable 
+        # x is from 0 to 800
+        # y is from 0 to 200
+        # r is either 1 or 2
+        # The last item of the list is a repeat of r
+        # We do this 200 times
         self.stars = [
             [
                 random.randrange(0, 800), 
@@ -33,11 +54,23 @@ class Artist:
             for _ in range(200)
         ]
 
+    def config_darkness(self, darkness: pygame.Surface) -> None:
+        darkness.set_alpha(200)
+        darkness.fill(Color.BLACK)
+    
+    def config_see_through(self, see_through: pygame.Surface) -> None:
+        see_through.set_alpha(150)
+        see_through.fill(Color.COLOR_KEY)
+        see_through.set_colorkey(Color.COLOR_KEY)
+
     def move_clouds(self) -> None:
         """Moves each cloud to the left 0.5 units"""
+
+        # Loop through each cloud in self.clouds and move it to the left 0.5 units
         for cloud in self.clouds:
             cloud[0] -= 0.5
 
+            # If we reach the edge of the screen, re-randomize its position
             if cloud[0] < -100:
                 cloud[0] = random.randrange(800, 1600)
                 cloud[1] = random.randrange(0, 150)
@@ -62,9 +95,19 @@ class Artist:
         cloud_color : tuple
             A tuple representing the (R,G,B) values of the cloud's color
         """
+
+        # Loop through each cloud in self.clouds and draw it 
+        # using self.draw_single_cloud(...)
+        # We draw the clouds onto the see_through surface
         for cloud in self.clouds:
-            self.draw_single_cloud(see_through, cloud[0], cloud[1], cloud_color)
+            self.draw_single_cloud(
+                see_through, 
+                cloud[0], 
+                cloud[1], 
+                cloud_color
+            )
         
+        # Place the see_through surface on top of the screen
         surface.blit(see_through, (0, 0))
     
     def draw_single_cloud(
@@ -87,11 +130,33 @@ class Artist:
         cloud_color : tuple
             A tuple representing the (R, G, B) values of the cloud's color
         """
-        pygame.draw.ellipse(surface, cloud_color, [x, y + 8, 10, 10])
-        pygame.draw.ellipse(surface, cloud_color, [x + 6, y + 4, 8, 8])
-        pygame.draw.ellipse(surface, cloud_color, [x + 10, y, 16, 16])
-        pygame.draw.ellipse(surface, cloud_color, [x + 20, y + 8, 10, 10])
-        pygame.draw.rect(surface, cloud_color, [x + 6, y + 8, 18, 10])
+
+        # Draw the cloud shape by drawing some ellipse
+        pygame.draw.ellipse( # Bottom Left
+            surface, 
+            cloud_color, 
+            [x, y + 8, 10, 10]
+        )
+        pygame.draw.ellipse( # Top Left
+            surface, 
+            cloud_color, 
+            [x + 6, y + 4, 8, 8]
+        )
+        pygame.draw.ellipse( # Top Right
+            surface, 
+            cloud_color, 
+            [x + 10, y, 16, 16]
+        )
+        pygame.draw.ellipse( # Bottom Right
+            surface, 
+            cloud_color, 
+            [x + 20, y + 8, 10, 10]
+        )
+        pygame.draw.rect( # Bottom
+            surface, 
+            cloud_color, 
+            [x + 6, y + 8, 18, 10]
+        )
     
     def draw_stars(self, surface: pygame.Surface) -> None:
         """
@@ -102,8 +167,14 @@ class Artist:
         surface : pygame.Surface
             The surface to draw the stars onto
         """
+
+        # Loop through each star in self.stars and draw an ellipse at the location
         for star in self.stars:
-            pygame.draw.ellipse(surface, Color.WHITE, star)
+            pygame.draw.ellipse(
+                surface, 
+                Color.WHITE, 
+                star
+            )
 
     def draw_fence(self, surface: pygame.Surface) -> None:
         """
@@ -114,17 +185,22 @@ class Artist:
         surface : pygame.Surface
             The surface to draw the fences onto
         """
+
+        # Draw the vertical fence separators
         y = 170
         for x in range(5, 800, 30):
             pygame.draw.polygon(
                 surface, 
                 Color.NIGHT_GRAY, 
-                [[x + 2, y], 
-                [x + 2, y + 15], 
-                [x, y + 15], 
-                [x, y]]
+                [
+                    [x + 2, y], 
+                    [x + 2, y + 15], 
+                    [x, y + 15], 
+                    [x, y]
+                ]
             )
 
+        # Draw the vertical fence parts (not the separators)
         y = 170
         for x in range(5, 800, 3):
             pygame.draw.line(
@@ -135,6 +211,7 @@ class Artist:
                 1
             )
 
+        # Draw the horizontal fence parts
         x = 0
         for y in range(170, 185, 4):
             pygame.draw.line(
@@ -162,11 +239,26 @@ class Artist:
         sky_color : tuple
             A tuple representing the (R, G, B) values of the sky's color
         """
+
+        # If it's day, draw the sun
         if is_day:
-            pygame.draw.ellipse(surface, Color.BRIGHT_YELLOW, [520, 50, 40, 40])
+            pygame.draw.ellipse(
+                surface, 
+                Color.BRIGHT_YELLOW, 
+                [520, 50, 40, 40]
+            )
+        # If it's night, draw the moon
         else:
-            pygame.draw.ellipse(surface, Color.WHITE, [520, 50, 40, 40]) 
-            pygame.draw.ellipse(surface, sky_color, [530, 45, 40, 40])
+            pygame.draw.ellipse(
+                surface, 
+                Color.WHITE,
+                [520, 50, 40, 40]
+            ) # The moon ellipse
+            pygame.draw.ellipse(
+                surface, 
+                sky_color, 
+                [530, 45, 40, 40]
+            ) # The moon cutout, for the crescendo shape
 
     def check_darkness(
         self, 
@@ -191,6 +283,7 @@ class Artist:
         darkness : pygame.Surface
             The surface that visually darkens the original surface
         """
+        # Check if it should be dark and place the darkness surface onto the screen
         if not (is_day or light_on):
             surface.blit(darkness, (0, 0))   
 
@@ -211,14 +304,22 @@ class Artist:
         stripe_color : tuple
             A tuple representing the (R, G, B) values of the stripe's color
         """
+
+        # Draw the base field
         y = 180
         pygame.draw.rect(
-            surface, field_color, [0, y, 800 , 420]
+            surface, 
+            field_color, 
+            [0, y, 800 , 420]
         
         )
+
+        # Draw each stripe on the field
         for height in [42, 52, 62, 82]:
             pygame.draw.rect(
-                surface, stripe_color, [0, y, 800, height]
+                surface, 
+                stripe_color, 
+                [0, y, 800, height]
             )
             y += 2 * height
 
@@ -231,6 +332,8 @@ class Artist:
         surface : pygame.Surface
             The surface to draw the grass onto
         """
+
+        # Set constants that will determine the size of the field
         top_y = 220
         top_left = 140
         top_right = 660
@@ -300,6 +403,8 @@ class Artist:
         surface : pygame.Surface
             The surface to draw the grass onto
         """
+
+        # Left
         pygame.draw.line(
             surface, 
             Color.WHITE, 
@@ -307,6 +412,7 @@ class Artist:
             [180, 300], 
             5
         )
+        # Bottom
         pygame.draw.line(
             surface, 
             Color.WHITE, 
@@ -314,6 +420,7 @@ class Artist:
             [620, 300], 
             3
         )
+        # Right
         pygame.draw.line(
             surface, 
             Color.WHITE, 
@@ -349,16 +456,21 @@ class Artist:
         surface : pygame.Surface
             The surface to draw the grass onto
         """
+        
+        # Scoreboard Stand
         pygame.draw.rect(
             surface, 
             Color.GRAY, 
             [390, 120, 20, 70]
         )
+
+        # Scoreboard Screen
         pygame.draw.rect(
             surface, 
             Color.BLACK, 
             [300, 40, 200, 90]
         )
+        # Scoreboard Border
         pygame.draw.rect(
             surface, 
             Color.WHITE, 
@@ -375,6 +487,8 @@ class Artist:
         surface : pygame.Surface
             The surface to draw the grass onto
         """
+
+        # Goal Border
         pygame.draw.rect(
             surface, 
             Color.WHITE, 
@@ -382,6 +496,8 @@ class Artist:
             160, 80], 
             5
         )
+
+        # Goal Bottom Center
         pygame.draw.line(
             surface, 
             Color.WHITE, 
@@ -389,6 +505,7 @@ class Artist:
             [460, 200], 
             3
         )
+        # Goal Bottom Left
         pygame.draw.line(
             surface, 
             Color.WHITE, 
@@ -396,6 +513,7 @@ class Artist:
             [340, 200], 
             3
         )
+        # Goal Bottom Right
         pygame.draw.line(
             surface, 
             Color.WHITE, 
@@ -403,6 +521,8 @@ class Artist:
             [460, 200], 
             3
         )
+
+        # Goal Stand Left
         pygame.draw.line(
             surface, 
             Color.WHITE, 
@@ -410,6 +530,7 @@ class Artist:
             [340, 200], 
             3
         )
+        # Goal Stand Right
         pygame.draw.line(
             surface, 
             Color.WHITE, 
@@ -427,6 +548,8 @@ class Artist:
         surface : pygame.Surface
             The surface to draw the grass onto
         """
+
+        # Left
         pygame.draw.line(
             surface, 
             Color.WHITE, 
@@ -434,6 +557,7 @@ class Artist:
             [270, 270], 
             3
         )
+        # Bottom
         pygame.draw.line(
             surface, 
             Color.WHITE, 
@@ -441,6 +565,7 @@ class Artist:
             [530, 270], 
             2
         )
+        # Right
         pygame.draw.line(
             surface, 
             Color.WHITE, 
@@ -458,22 +583,29 @@ class Artist:
         surface : pygame.Surface
             The surface to draw the grass onto
         """
+
+        # Left Pole
+        # Pole
         pygame.draw.rect(
             surface, 
             Color.GRAY, 
             [150, 60, 20, 140]
         )
+        # Bottom
         pygame.draw.ellipse(
             surface, 
             Color.GRAY, 
             [150, 195, 20, 10]
         )
 
+        # Right Pole
+        # Pole
         pygame.draw.rect(
             surface, 
             Color.GRAY, 
             [630, 60, 20, 140]
         )
+        # Bottom
         pygame.draw.ellipse(
             surface, 
             Color.GRAY, 
@@ -494,7 +626,9 @@ class Artist:
         light_color : tuple
             A tuple representing the (R, G, B) values of the color of the light
         """
+        # Left Pole
         light_pos1 = 0
+        # Draw the two separator lines on the pole
         for i in range(1,3):
             pygame.draw.line(
                 surface, 
@@ -503,6 +637,7 @@ class Artist:
                 [210, 80 - 20*i], 
                 2
             )
+            # For each separator, draw 6 light bulbs
             for i in range(1,6):
                 pygame.draw.ellipse(
                     surface, 
@@ -510,7 +645,7 @@ class Artist:
                     [90 + 20*i, 40 - light_pos1, 20, 20]
                 )
             light_pos1 += 20
-        
+        # Draw the left pole's top border
         pygame.draw.line(
             surface, 
             Color.GRAY, 
@@ -519,7 +654,9 @@ class Artist:
             2
         )
 
+        # Right Pole
         light_pos2 = 0
+        # Draw the two separator lines on the pole
         for i in range(1,3):
             pygame.draw.line(
                 surface, 
@@ -528,6 +665,7 @@ class Artist:
                 [690, 80 - 20*i], 
                 2
             )
+            # For each separator, draw 6 light bulbs
             for i in range(1,6):
                 pygame.draw.ellipse(
                     surface, 
@@ -535,6 +673,7 @@ class Artist:
                     [570 + 20*i, 40 - light_pos2, 20, 20]
                     )
             light_pos2 += 20
+        # Draw the right pole's top border
         pygame.draw.line(
             surface, 
             Color.GRAY, 
@@ -552,7 +691,10 @@ class Artist:
         surface : pygame.Surface
             The surface to draw the grass onto
         """
-        #net
+        
+        # DOWN
+        # CENTER
+        # Left
         for i in range(1, 9):
             pygame.draw.line(
                 surface, 
@@ -561,6 +703,7 @@ class Artist:
                 [338 + 3*i, 200], 
                 1
             )
+        # MidLeft
         for i in range(1, 5):
             pygame.draw.line(
                 surface, 
@@ -569,6 +712,8 @@ class Artist:
                 [361 + 4*i, 200], 
                 1
             )
+
+        # Mid
         pygame.draw.line(
             surface, 
             Color.WHITE, 
@@ -591,6 +736,8 @@ class Artist:
             [423, 200], 
             1
         )
+
+        # MidRight
         for i in range(1, 4):
             pygame.draw.line(
                 surface, 
@@ -606,6 +753,7 @@ class Artist:
             [438, 200], 
             1
         )
+        # Right
         for i in range(1, 8):
             pygame.draw.line(
                 surface, 
@@ -615,7 +763,7 @@ class Artist:
                 1
             )
 
-        #net part 2
+        # LEFT
         for i in range(1, 9):
             pygame.draw.line(
                 surface, 
@@ -625,7 +773,7 @@ class Artist:
                 1
             )
 
-        #net part 3
+        # RIGHT
         for i in range(1, 9):
             pygame.draw.line(
                 surface, 
@@ -635,7 +783,8 @@ class Artist:
                 1
             )
 
-        #net part 4
+        # ACROSS
+        # TOP
         for i in range(1, 10):
             pygame.draw.line(
                 surface, 
@@ -644,6 +793,8 @@ class Artist:
                 [476, 140 + i*4], 
                 1
             )
+        
+        # MIDDLE
         pygame.draw.line(
             surface, 
             Color.WHITE, 
@@ -651,6 +802,8 @@ class Artist:
             [470, 180], 
             1
         )
+
+        # BOTTOM
         for i in range(1, 5):
             pygame.draw.line(
                 surface, 
@@ -668,7 +821,8 @@ class Artist:
         surface : pygame.Surface
             The surface to draw the grass onto
         """
-        #stands right
+        # RIGHT
+        # Bottom
         pygame.draw.polygon(
             surface, 
             Color.RED, 
@@ -679,6 +833,7 @@ class Artist:
                 [680, 180]
             ]
         )
+        # Top
         pygame.draw.polygon(
             surface, 
             Color.WHITE, 
@@ -689,7 +844,8 @@ class Artist:
             ]
         )
 
-        #stands left
+        # LEFT
+        # Bottom
         pygame.draw.polygon(
             surface, 
             Color.RED, 
@@ -700,6 +856,7 @@ class Artist:
                 [120, 180]
             ]
         )
+        # Top
         pygame.draw.polygon(
             surface, 
             Color.WHITE, 
@@ -719,7 +876,8 @@ class Artist:
         surface : pygame.Surface
             The surface to draw the grass onto
         """
-        #corner flag right
+        # RIGHT
+        # Stand
         pygame.draw.line(
             surface, 
             Color.BRIGHT_YELLOW, 
@@ -727,6 +885,7 @@ class Artist:
             [135, 190], 
             3
         )
+        # Flag
         pygame.draw.polygon(
             surface, 
             Color.RED, 
@@ -737,7 +896,8 @@ class Artist:
             ]
         )
 
-        #corner flag left
+        # LEFT
+        # Stand
         pygame.draw.line(
             surface, 
             Color.BRIGHT_YELLOW, 
@@ -745,6 +905,7 @@ class Artist:
             [665, 190], 
             3
         )
+        # Flag
         pygame.draw.polygon(
             surface, 
             Color.RED, 
@@ -779,27 +940,35 @@ class Artist:
         light_color : tuple
             A tuple representing the (R, G, B) values of the light's color
         """
+        # Draw the grass
         self.draw_grass(surface, field_color, stripe_color)
 
+        # Draw the back fence
         self.draw_fence(surface)
 
+        # Draw field markings
         self.draw_out_of_bounds(surface)
         self.draw_safety_circle(surface)
         self.draw_outer_goal_box(surface)
+        self.draw_inner_goal_box(surface)
         self.draw_arc(surface)
 
+        # Draw the scoreboard
         self.draw_scoreboard(surface)
 
+        # Draw the goal frame
         self.draw_goal(surface)
-        self.draw_inner_goal_box(surface)
+        # Draw the nets
+        self.draw_net(surface)
 
+        # Draw the light poles and lights
         self.draw_light_poles(surface)
         self.draw_lights(surface, light_color)
 
-        self.draw_net(surface)
-
+        # Draw the audience stands
         self.draw_stands(surface)
 
+        # Draw the corner flags
         self.draw_corner_flags(surface)
     
     def update_screen(self) -> None:

@@ -1,5 +1,6 @@
 import pygame
-from colors import Color
+
+# File Imports
 from config import Config
 from artist import Artist
 
@@ -53,20 +54,26 @@ class PygameHandler:
         artist : Artist
             An instance of the Artist class that houses all the drawing functions
         """
+        # Set the config and artist passed in
         self.config: Config = config
         self.artist: Artist = artist
 
+        # Initialize the Pygame module
         self.init_pygame()
 
+        # Set the size fields
         self.width: int = 800
         self.height: int = 600
 
-        self.create_display(self.width, self.height)
+        # Create the background timer
         self.create_timer()
 
-        self.create_darkness()
-        self.create_see_through()
+        # Create the necessary surfaces
+        self.create_display(self.width, self.height) # The main screen
+        self.create_darkness() # A darkness overlay
+        self.create_see_through() # A see-through overlay
 
+        # Whether or not the game is done
         self.done: bool = False
     
     def init_pygame(self) -> None:
@@ -122,8 +129,7 @@ class PygameHandler:
                                                         (self.width, 
                                                         self.height)
                                                     )
-        self.darkness.set_alpha(200)
-        self.darkness.fill(Color.BLACK)
+        self.artist.config_darkness(self.darkness)
     
     def create_see_through(self) -> None:
         """
@@ -133,17 +139,18 @@ class PygameHandler:
                                                             (self.width, 
                                                             self.height/3.75)
                                                         )
-        self.see_through.set_alpha(150)
+        self.artist.config_see_through(self.see_through)
     
     def handle_events(self) -> None:
         """
         Handles all events in the Pygame event queue
         """
+        # The general Pygame event handling method
         for event in pygame.event.get():
-            if event.type == pygame.QUIT:
-                self.done = True
-            elif event.type == pygame.KEYDOWN:
-                self.handle_key_events(event)
+            if event.type == pygame.QUIT: # If the user is quitting
+                self.done = True # We are done
+            elif event.type == pygame.KEYDOWN: # If a key is pressed
+                self.handle_key_events(event) # Delegate to a different function
 
     def handle_key_events(self, event: pygame.event.Event) -> None:
         """
@@ -154,10 +161,12 @@ class PygameHandler:
         event: pygame.event.Event
             A keyboard-press event that will be analyzed in the function
         """
+        # If the key is the L key
         if event.key == pygame.K_l:
-            self.config.switch_light()
+            self.config.switch_light() # Turn the lights off
+        # If the key is the D key
         elif event.key == pygame.K_d:
-            self.config.switch_day()
+            self.config.switch_day() # Switch whether it's day or night
 
     def clock_tick(self) -> None:
         """
@@ -169,30 +178,37 @@ class PygameHandler:
         """
         The main game loop that calls all the necessary functions to run the game.
         """
+        # While the user has not exited
         while not self.done:
+            # Handle any events if necessary (key presses, exiting)
             self.handle_events()
 
-            self.artist.move_clouds()
-            
+
+            # Maintain the see-through layer
             self.screen.fill(self.config.sky_color)
-            self.see_through.fill(Color.COLOR_KEY)
-            self.see_through.set_colorkey(Color.COLOR_KEY)
-    
+            self.artist.config_see_through(self.see_through)
+
+            # If it's nighttime, draw the stars
             if not self.config.day:
                 self.artist.draw_stars(self.see_through)
 
+            # Maintain daytiome or nighttime by drawing the sun or moon
             self.artist.draw_sun_or_moon(
                 self.screen, 
                 self.config.day, 
                 self.config.sky_color
             )
 
+            # Move the clouds
+            self.artist.move_clouds()
+            # Draw the moved clouds
             self.artist.draw_clouds(
                 self.screen, 
                 self.see_through, 
                 self.config.cloud_color
             )
 
+            # Maintain the field colors by redrawing the entire field
             self.artist.draw_field(
                 self.screen, 
                 self.config.field_color, 
@@ -200,6 +216,7 @@ class PygameHandler:
                 self.config.light_color
             )
 
+            # Check if the darkness layer should be added
             self.artist.check_darkness(
                 self.config.day, 
                 self.config.light_on, 
@@ -207,10 +224,11 @@ class PygameHandler:
                 self.darkness
             ) 
 
+            # Update the screen and tick via refresh rate
             self.artist.update_screen()
-
             self.clock_tick()
 
+        # The user has exited the screen, so quit the Pygame instance
         self.quit()
 
     def quit(self) -> None:
