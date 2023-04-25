@@ -22,8 +22,15 @@ class Artist:
         self.init_clouds()
         self.init_stars()
     
-    def init_clouds(self) -> None:
-        """Creates a list of 20 random [x,y] coordinates for cloud positions"""
+    def init_clouds(self, cloud_count: int = 20) -> None:
+        """
+        Creates a list of 20 random [x,y] coordinates for cloud positions
+        
+        Parameters
+        ----------
+        cloud_count : int
+            The number of clouds to create (default 20)
+        """
         
         # List comprehension to create a list of [rand number x, rand number y]
         # x is from -100 to 1600
@@ -31,11 +38,20 @@ class Artist:
         # We do this 20 times
         self.clouds = [
             [random.randrange(-100, 1600), random.randrange(0, 150)]
-            for _ in range(20)
+            for _ in range(cloud_count)
             ]
     
-    def init_stars(self) -> None:
-        """Creates a list of 20 random [x,y,size] coordinates for stars"""
+    def init_stars(self, star_count:int = 200, max_star_size:int = 2) -> None:
+        """
+        Creates a list of 200 random [x,y,size] coordinates for stars
+        
+        Parameters
+        ----------
+        star_count : int
+            The number of stars to create (default 200)
+        max_star_size : int
+            The maximum size for stars
+        """
         
         # List comprehension to create a list of [rand x, rand y, rand r, r]
         # These values will be used to create an elipse, so it needs an extra 'rect' variable 
@@ -48,27 +64,36 @@ class Artist:
             [
                 random.randrange(0, 800), 
                 random.randrange(0, 200),
-                r:=random.randrange(1, 2),
+                r:=random.randrange(1, max_star_size),
                 r
             ]
-            for _ in range(200)
+            for _ in range(star_count)
         ]
 
     def config_darkness(self, darkness: pygame.Surface) -> None:
+        """Initializes the darkness surface"""
         darkness.set_alpha(200)
         darkness.fill(Color.BLACK)
     
     def config_see_through(self, see_through: pygame.Surface) -> None:
+        """Initializes the see_through surface"""
         see_through.set_alpha(150)
         see_through.fill(Color.COLOR_KEY)
         see_through.set_colorkey(Color.COLOR_KEY)
 
-    def move_clouds(self) -> None:
-        """Moves each cloud to the left 0.5 units"""
+    def move_clouds(self, cloud_speed: float = 0.5) -> None:
+        """
+        Moves each cloud to the left 0.5 units.
+        
+        Parameters
+        ----------
+        cloud_speed : float
+            How many units to move clouds each tick
+        """
 
         # Loop through each cloud in self.clouds and move it to the left 0.5 units
         for cloud in self.clouds:
-            cloud[0] -= 0.5
+            cloud[0] -= cloud_speed
 
             # If we reach the edge of the screen, re-randomize its position
             if cloud[0] < -100:
