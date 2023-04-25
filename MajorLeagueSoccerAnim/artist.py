@@ -136,11 +136,11 @@ class Artist:
         surface.blit(see_through, (0, 0))
     
     def draw_single_cloud(
-        self, 
-        surface: pygame.Surface, 
-        x: int, 
-        y: int, 
-        cloud_color: tuple) -> None:
+            self, 
+            surface: pygame.Surface, 
+            x: int, 
+            y: int, 
+            cloud_color: tuple) -> None:
         """
         Draws a single cloud given its (x, y) coordinates and its color
 
@@ -286,11 +286,11 @@ class Artist:
             ) # The moon cutout, for the crescendo shape
 
     def check_darkness(
-        self, 
-        is_day: bool, 
-        light_on: bool, 
-        surface: pygame.Surface, 
-        darkness: pygame.Surface) -> None:
+            self, 
+            is_day: bool, 
+            light_on: bool, 
+            surface: pygame.Surface, 
+            darkness: pygame.Surface) -> None:
         """
         Determines the darkness of the field based on is_day and light_on
 
