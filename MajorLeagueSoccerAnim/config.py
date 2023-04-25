@@ -126,7 +126,7 @@ class Config:
         # White if it's day, Night-Gray otherwise
         return Color.WHITE if self._day else Color.NIGHT_GRAY
 
-    def switch_light(self):
+    def switch_light(self) -> None:
         """
         Switches whether or not the lights are on
 
@@ -135,7 +135,7 @@ class Config:
         # Just flip the bool
         self._lights_on = not self._lights_on
     
-    def switch_day(self):
+    def switch_day(self) -> None:
         """
         Switches whether or not it's day
 
