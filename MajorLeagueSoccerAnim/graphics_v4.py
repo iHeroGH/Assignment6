@@ -9,5 +9,6 @@ artist = Artist()
 # Create the handler by using the config and artist
 handler = PygameHandler(config, artist)
 
-# Start the game
-handler.game_loop()
+if __name__ == '__main__':
+    # Start the game
+    handler.game_loop()
