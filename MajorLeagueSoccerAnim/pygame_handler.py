@@ -191,7 +191,7 @@ class PygameHandler:
             if not self.config.day:
                 self.artist.draw_stars(self.screen)
 
-            # Maintain daytiome or nighttime by drawing the sun or moon
+            # Maintain daytime or nighttime by drawing the sun or moon
             self.artist.draw_sun_or_moon(
                 self.screen, 
                 self.config.day, 
